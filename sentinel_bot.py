@@ -13,6 +13,9 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from core.models import MarketAsset, ActionDecision, SignalType
 from core.agent import AlphaPulseAgent
 from core.telegraph_client import TelegraphClient
+from core.swarm import TelegraphSwarmArbiter
+from core.database import AlphaVaultDB
+from core.market_data import MarketDataProvider
 
 load_dotenv()
 
@@ -28,6 +31,7 @@ class TelegramSentinel:
 
     def __init__(self, agent: Optional[AlphaPulseAgent] = None):
         self.agent = agent or AlphaPulseAgent(telegraph_client=TelegraphClient(mode="MOCK"))
+        self.arbiter = TelegraphSwarmArbiter(telegraph_client=self.agent.telegraph)
         self.offset = 0
 
     def send_message(self, chat_id: str, text: str, parse_mode: str = "HTML") -> bool:
@@ -47,8 +51,8 @@ class TelegramSentinel:
             print(f"Error sending Telegram message: {e}")
             return False
 
-    def format_report_message(self, report) -> str:
-        """Formats a Verifiable Alpha Report for Telegram."""
+    def format_report_message(self, report, swarm_res=None) -> str:
+        """Formats a Verifiable Alpha Report with Swarm synthesis for Telegram."""
         action_emoji = {
             ActionDecision.STRONG_BUY: "🟢🟢 <b>STRONG BUY</b>",
             ActionDecision.BUY: "🟢 <b>BUY</b>",
@@ -65,6 +69,14 @@ class TelegramSentinel:
                 f"• {', '.join(report.raw_intelligence.rogue_miners_detected)} (Blocked for hallucination/spoofing)"
             )
 
+        swarm_section = ""
+        if swarm_res and swarm_res.swarm_thoughts:
+            swarm_lines = []
+            for t in swarm_res.swarm_thoughts:
+                emoji = "🚨" if t.detected_anomaly else "🔍"
+                swarm_lines.append(f"{emoji} <b>{t.agent_name.split('-')[0]}:</b> <i>{t.key_observation[:90]}...</i>")
+            swarm_section = "\n\n🐝 <b>Swarm Sub-Agents Telemetry:</b>\n" + "\n".join(swarm_lines)
+
         target = report.trade_parameters.get('target_price')
         stop = report.trade_parameters.get('stop_loss')
         trade_bounds = ""
@@ -74,20 +86,24 @@ class TelegramSentinel:
                 f"🛑 <b>Stop Loss:</b> ${stop:,.2f}"
             )
 
+        signer_str = f"\n✍️ <b>EIP-712 Signer:</b> <code>{swarm_res.eip712_attestation['signer_address'][:10]}...</code>" if swarm_res else ""
+
         msg = (
-            f"⚡ <b>TELEGRAPH ALPHAPULSE ALERT</b>\n"
+            f"⚡ <b>TELEGRAPH ALPHAPULSE SWARM ALERT</b>\n"
             f"━━━━━━━━━━━━━━━━━━━\n"
             f"<b>Asset:</b> <code>{report.asset.value}</code>\n"
             f"<b>Live Price:</b> ${report.current_price:,.2f}\n"
             f"<b>Recommendation:</b> {action_emoji}\n"
             f"<b>Telegraph Consensus:</b> {int(report.confidence * 100)}%\n"
             f"<b>Top Rated Miner:</b> <code>{report.top_miner_name}</code>\n"
-            f"{trade_bounds}\n\n"
-            f"📊 <b>Evaluation Rationale:</b>\n"
-            f"<i>{report.raw_intelligence.responses[0].reasoning}</i>"
+            f"{trade_bounds}"
+            f"{swarm_section}\n\n"
+            f"📊 <b>Arbiter Narrative:</b>\n"
+            f"<i>{swarm_res.execution_narrative if swarm_res else report.raw_intelligence.responses[0].reasoning}</i>"
             f"{rogue_section}\n\n"
-            f"🔐 <b>Verifiable Hash:</b>\n"
-            f"<code>{report.telegraph_verification_hash[:24]}...</code>"
+            f"🔐 <b>Verifiable Signature:</b>\n"
+            f"<code>{report.telegraph_verification_hash[:26]}...</code>"
+            f"{signer_str}"
         )
         return msg
 
@@ -99,13 +115,14 @@ class TelegramSentinel:
 
         if cmd in ["/start", "/help"]:
             welcome = (
-                "⚡ <b>Welcome to Telegraph AlphaPulse Sentinel!</b>\n\n"
-                "I am your autonomous financial agent powered by the <b>Telegraph Protocol</b>.\n\n"
+                "⚡ <b>Welcome to Telegraph AlphaPulse Swarm!</b>\n\n"
+                "I am your autonomous financial agent powered by <b>Telegraph Protocol</b> & Multi-Agent Swarm.\n\n"
                 "<b>Commands:</b>\n"
-                "• <code>/audit BTC</code> - Run verifiable audit on Bitcoin\n"
-                "• <code>/audit ETH</code> - Run verifiable audit on Ethereum\n"
-                "• <code>/audit SOL</code> - Run verifiable audit on Solana\n"
+                "• <code>/audit BTC</code> - Run swarm audit on Bitcoin (Binance Live)\n"
+                "• <code>/audit ETH</code> - Run swarm audit on Ethereum\n"
+                "• <code>/audit SOL</code> - Run swarm audit on Solana\n"
                 "• <code>/simulate spoofing</code> - Test spoofing attack defense\n"
+                "• <code>/backtest</code> - View 60-day quant performance summary\n"
                 "• <code>/status</code> - Check Telegraph engine status"
             )
             self.send_message(chat_id, welcome)
@@ -113,28 +130,52 @@ class TelegramSentinel:
         elif cmd == "/status":
             status = (
                 "🟢 <b>Telegraph Protocol Agent Status: ONLINE</b>\n"
-                "• Engine: Season II Engine Ready\n"
+                "• Architecture: Multi-Agent Swarm (Whale + Micro + Macro)\n"
                 "• Evaluators: WASM Sandbox Active\n"
+                "• Web3 Layer: EIP-712 Typed Data Signatures Ready\n"
+                "• Vault DB: SQLite Persistent Logs\n"
                 "• Data Feed: Live Binance REST + Fallback Telemetry\n"
                 "• Hackathon Track: Apps & Agents"
             )
             self.send_message(chat_id, status)
+
+        elif cmd == "/backtest":
+            from core.backtest import QuantitativeBacktestEngine
+            bt = QuantitativeBacktestEngine.run_simulation(60)["summary"]
+            bt_msg = (
+                f"📊 <b>QUANTITATIVE BACKTEST (60 PERIODS)</b>\n"
+                f"━━━━━━━━━━━━━━━━━━━\n"
+                f"⚡ <b>Telegraph Return:</b> +{bt['telegraph_total_return_pct']}%\n"
+                f"❌ <b>Raw LLM Return:</b> {bt['raw_total_return_pct']}%\n"
+                f"📈 <b>Sharpe Ratio:</b> {bt['telegraph_sharpe']} (vs {bt['raw_sharpe']})\n"
+                f"🛡️ <b>Spoofing Blocked:</b> {bt['spoofing_attacks_avoided_pct']}%\n"
+                f"📉 <b>Max Drawdown:</b> {bt['telegraph_max_drawdown_pct']}% (vs {bt['raw_max_drawdown_pct']}%)"
+            )
+            self.send_message(chat_id, bt_msg)
 
         elif cmd == "/audit":
             asset_code = parts[1].upper() if len(parts) > 1 else "BTC"
             asset_map = {"BTC": MarketAsset.BTC, "ETH": MarketAsset.ETH, "SOL": MarketAsset.SOL}
             asset = asset_map.get(asset_code, MarketAsset.BTC)
 
-            self.send_message(chat_id, f"🔍 <i>Querying Telegraph miners & evaluators for {asset.value}...</i>")
+            self.send_message(chat_id, f"🔍 <i>Swarm analyzing on-chain, orderbook, and Telegraph miners for {asset.value}...</i>")
+            snapshot = MarketDataProvider.get_market_snapshot(asset, scenario="NORMAL")
             report = self.agent.run_market_audit(asset, scenario="NORMAL")
-            self.send_message(chat_id, self.format_report_message(report))
+            swarm_res = self.arbiter.arbitrate(asset, snapshot)
+            AlphaVaultDB.log_swarm_consensus(swarm_res, "NORMAL", snapshot["current_price"])
+
+            self.send_message(chat_id, self.format_report_message(report, swarm_res))
 
         elif cmd == "/simulate":
             scen_code = parts[1].upper() if len(parts) > 1 else "SPOOFING"
             scenario = "SPOOFING_MANIPULATION" if "SPOOF" in scen_code else "FLASH_CRASH_RISK"
-            self.send_message(chat_id, f"🚨 <i>Injecting {scenario} into market stream to test Telegraph defense...</i>")
+            self.send_message(chat_id, f"🚨 <i>Injecting {scenario} to test Telegraph defense...</i>")
+            snapshot = MarketDataProvider.get_market_snapshot(MarketAsset.BTC, scenario=scenario)
             report = self.agent.run_market_audit(MarketAsset.BTC, scenario=scenario)
-            self.send_message(chat_id, self.format_report_message(report))
+            swarm_res = self.arbiter.arbitrate(MarketAsset.BTC, snapshot)
+            AlphaVaultDB.log_swarm_consensus(swarm_res, scenario, snapshot["current_price"])
+
+            self.send_message(chat_id, self.format_report_message(report, swarm_res))
 
         else:
             self.send_message(chat_id, "Unknown command. Use /help to see available commands.")
