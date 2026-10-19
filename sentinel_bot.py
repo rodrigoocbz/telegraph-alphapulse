@@ -37,7 +37,7 @@ class TelegramSentinel:
     def send_message(self, chat_id: str, text: str, parse_mode: str = "HTML") -> bool:
         """Sends an HTML formatted alert to a Telegram chat."""
         if not TELEGRAM_TOKEN or TELEGRAM_TOKEN.startswith("your_"):
-            print(f"\n[TELEGRAM DEMO NOTIFICATION to {chat_id}]:\n{text}\n")
+            print(f"\n[TELEGRAM NOTIFICATION to {chat_id}]:\n{text}\n")
             return True
 
         try:
@@ -53,56 +53,56 @@ class TelegramSentinel:
 
     def format_report_message(self, report, swarm_res=None) -> str:
         """Formats a Verifiable Alpha Report with Swarm synthesis for Telegram."""
-        action_emoji = {
-            ActionDecision.STRONG_BUY: "🟢🟢 <b>STRONG BUY</b>",
-            ActionDecision.BUY: "🟢 <b>BUY</b>",
-            ActionDecision.NEUTRAL: "🟡 <b>NEUTRAL / HOLD</b>",
-            ActionDecision.SELL: "🔴 <b>SELL</b>",
-            ActionDecision.STRONG_SELL: "🔴🔴 <b>STRONG SELL</b>",
-            ActionDecision.AVOID_RISK: "🚨 <b>EXTREME WARNING / AVOID RISK</b>"
-        }.get(report.action, report.action.value)
+        action_label = {
+            ActionDecision.STRONG_BUY: "<b>[STRONG BUY]</b>",
+            ActionDecision.BUY: "<b>[BUY]</b>",
+            ActionDecision.NEUTRAL: "<b>[NEUTRAL / HOLD]</b>",
+            ActionDecision.SELL: "<b>[SELL]</b>",
+            ActionDecision.STRONG_SELL: "<b>[STRONG SELL]</b>",
+            ActionDecision.AVOID_RISK: "<b>[EXTREME WARNING: AVOID RISK]</b>"
+        }.get(report.action, f"<b>[{report.action.value}]</b>")
 
         rogue_section = ""
         if report.raw_intelligence.rogue_miners_detected:
             rogue_section = (
-                f"\n\n🚫 <b>Telegraph Evaluators Slashed:</b>\n"
-                f"• {', '.join(report.raw_intelligence.rogue_miners_detected)} (Blocked for hallucination/spoofing)"
+                f"\n\n<b>EVALUATOR REJECTIONS / SLASHED:</b>\n"
+                f"• {', '.join(report.raw_intelligence.rogue_miners_detected)} (Penalized for manipulation/hallucination)"
             )
 
         swarm_section = ""
         if swarm_res and swarm_res.swarm_thoughts:
             swarm_lines = []
             for t in swarm_res.swarm_thoughts:
-                emoji = "🚨" if t.detected_anomaly else "🔍"
-                swarm_lines.append(f"{emoji} <b>{t.agent_name.split('-')[0]}:</b> <i>{t.key_observation[:90]}...</i>")
-            swarm_section = "\n\n🐝 <b>Swarm Sub-Agents Telemetry:</b>\n" + "\n".join(swarm_lines)
+                status_tag = "[ANOMALY]" if t.detected_anomaly else "[NORMAL]"
+                swarm_lines.append(f"• <b>{t.agent_name.split('-')[0]}:</b> {status_tag} <i>{t.key_observation[:95]}...</i>")
+            swarm_section = "\n\n<b>SWARM TELEMETRY:</b>\n" + "\n".join(swarm_lines)
 
         target = report.trade_parameters.get('target_price')
         stop = report.trade_parameters.get('stop_loss')
         trade_bounds = ""
         if target and stop:
             trade_bounds = (
-                f"\n🎯 <b>Target:</b> ${target:,.2f}\n"
-                f"🛑 <b>Stop Loss:</b> ${stop:,.2f}"
+                f"\nTarget: ${target:,.2f}\n"
+                f"Stop Loss: ${stop:,.2f}"
             )
 
-        signer_str = f"\n✍️ <b>EIP-712 Signer:</b> <code>{swarm_res.eip712_attestation['signer_address'][:10]}...</code>" if swarm_res else ""
+        signer_str = f"\nEIP-712 Signer: <code>{swarm_res.eip712_attestation['signer_address'][:12]}...</code>" if swarm_res else ""
 
         msg = (
-            f"⚡ <b>TELEGRAPH ALPHAPULSE SWARM ALERT</b>\n"
-            f"━━━━━━━━━━━━━━━━━━━\n"
-            f"<b>Asset:</b> <code>{report.asset.value}</code>\n"
-            f"<b>Live Price:</b> ${report.current_price:,.2f}\n"
-            f"<b>Recommendation:</b> {action_emoji}\n"
-            f"<b>Telegraph Consensus:</b> {int(report.confidence * 100)}%\n"
-            f"<b>Top Rated Miner:</b> <code>{report.top_miner_name}</code>\n"
+            f"<b>TELEGRAPH ALPHAPULSE · SWARM DISPATCH</b>\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"Asset: <code>{report.asset.value}</code>\n"
+            f"Spot Price: ${report.current_price:,.2f}\n"
+            f"Action: {action_label}\n"
+            f"Consensus: {int(report.confidence * 100)}%\n"
+            f"Winning Miner: <code>{report.top_miner_name}</code>\n"
             f"{trade_bounds}"
             f"{swarm_section}\n\n"
-            f"📊 <b>Arbiter Narrative:</b>\n"
+            f"<b>ARBITER SYNTHESIS:</b>\n"
             f"<i>{swarm_res.execution_narrative if swarm_res else report.raw_intelligence.responses[0].reasoning}</i>"
             f"{rogue_section}\n\n"
-            f"🔐 <b>Verifiable Signature:</b>\n"
-            f"<code>{report.telegraph_verification_hash[:26]}...</code>"
+            f"Attestation Hash:\n"
+            f"<code>{report.telegraph_verification_hash[:28]}...</code>"
             f"{signer_str}"
         )
         return msg
@@ -115,27 +115,27 @@ class TelegramSentinel:
 
         if cmd in ["/start", "/help"]:
             welcome = (
-                "⚡ <b>Welcome to Telegraph AlphaPulse Swarm!</b>\n\n"
-                "I am your autonomous financial agent powered by <b>Telegraph Protocol</b> & Multi-Agent Swarm.\n\n"
+                "<b>AlphaPulse Swarm Sentinel</b>\n"
+                "Autonomous Financial Intelligence Engine · Telegraph Protocol Season II\n\n"
                 "<b>Commands:</b>\n"
-                "• <code>/audit BTC</code> - Run swarm audit on Bitcoin (Binance Live)\n"
-                "• <code>/audit ETH</code> - Run swarm audit on Ethereum\n"
-                "• <code>/audit SOL</code> - Run swarm audit on Solana\n"
-                "• <code>/simulate spoofing</code> - Test spoofing attack defense\n"
-                "• <code>/backtest</code> - View 60-day quant performance summary\n"
-                "• <code>/status</code> - Check Telegraph engine status"
+                "• <code>/audit BTC</code> - Execute Swarm audit on Bitcoin (Binance live feed)\n"
+                "• <code>/audit ETH</code> - Execute Swarm audit on Ethereum\n"
+                "• <code>/audit SOL</code> - Execute Swarm audit on Solana\n"
+                "• <code>/simulate spoofing</code> - Test orderbook manipulation defense\n"
+                "• <code>/backtest</code> - View 60-day empirical performance benchmark\n"
+                "• <code>/status</code> - Query agent engine health"
             )
             self.send_message(chat_id, welcome)
 
         elif cmd == "/status":
             status = (
-                "🟢 <b>Telegraph Protocol Agent Status: ONLINE</b>\n"
+                "<b>SYSTEM STATUS: OPERATIONAL</b>\n"
                 "• Architecture: Multi-Agent Swarm (Whale + Micro + Macro)\n"
                 "• Evaluators: WASM Sandbox Active\n"
                 "• Web3 Layer: EIP-712 Typed Data Signatures Ready\n"
                 "• Vault DB: SQLite Persistent Logs\n"
-                "• Data Feed: Live Binance REST + Fallback Telemetry\n"
-                "• Hackathon Track: Apps & Agents"
+                "• Feed: Live Binance REST + Fallback Telemetry\n"
+                "• Track: Apps & Agents"
             )
             self.send_message(chat_id, status)
 
@@ -143,13 +143,13 @@ class TelegramSentinel:
             from core.backtest import QuantitativeBacktestEngine
             bt = QuantitativeBacktestEngine.run_simulation(60)["summary"]
             bt_msg = (
-                f"📊 <b>QUANTITATIVE BACKTEST (60 PERIODS)</b>\n"
-                f"━━━━━━━━━━━━━━━━━━━\n"
-                f"⚡ <b>Telegraph Return:</b> +{bt['telegraph_total_return_pct']}%\n"
-                f"❌ <b>Raw LLM Return:</b> {bt['raw_total_return_pct']}%\n"
-                f"📈 <b>Sharpe Ratio:</b> {bt['telegraph_sharpe']} (vs {bt['raw_sharpe']})\n"
-                f"🛡️ <b>Spoofing Blocked:</b> {bt['spoofing_attacks_avoided_pct']}%\n"
-                f"📉 <b>Max Drawdown:</b> {bt['telegraph_max_drawdown_pct']}% (vs {bt['raw_max_drawdown_pct']}%)"
+                f"<b>QUANTITATIVE BENCHMARK (60 PERIODS)</b>\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"Telegraph Alpha Return: +{bt['telegraph_total_return_pct']}%\n"
+                f"Raw Unverified LLM Return: {bt['raw_total_return_pct']}%\n"
+                f"Sharpe Ratio: {bt['telegraph_sharpe']} (vs {bt['raw_sharpe']})\n"
+                f"Spoofing Attacks Avoided: {bt['spoofing_attacks_avoided_pct']}%\n"
+                f"Max Drawdown: {bt['telegraph_max_drawdown_pct']}% (vs {bt['raw_max_drawdown_pct']}%)"
             )
             self.send_message(chat_id, bt_msg)
 
@@ -158,7 +158,7 @@ class TelegramSentinel:
             asset_map = {"BTC": MarketAsset.BTC, "ETH": MarketAsset.ETH, "SOL": MarketAsset.SOL}
             asset = asset_map.get(asset_code, MarketAsset.BTC)
 
-            self.send_message(chat_id, f"🔍 <i>Swarm analyzing on-chain, orderbook, and Telegraph miners for {asset.value}...</i>")
+            self.send_message(chat_id, f"<i>Interrogating on-chain, orderbook, and Telegraph miners for {asset.value}...</i>")
             snapshot = MarketDataProvider.get_market_snapshot(asset, scenario="NORMAL")
             report = self.agent.run_market_audit(asset, scenario="NORMAL")
             swarm_res = self.arbiter.arbitrate(asset, snapshot)
@@ -169,7 +169,7 @@ class TelegramSentinel:
         elif cmd == "/simulate":
             scen_code = parts[1].upper() if len(parts) > 1 else "SPOOFING"
             scenario = "SPOOFING_MANIPULATION" if "SPOOF" in scen_code else "FLASH_CRASH_RISK"
-            self.send_message(chat_id, f"🚨 <i>Injecting {scenario} to test Telegraph defense...</i>")
+            self.send_message(chat_id, f"<i>Injecting {scenario} to test Telegraph defense...</i>")
             snapshot = MarketDataProvider.get_market_snapshot(MarketAsset.BTC, scenario=scenario)
             report = self.agent.run_market_audit(MarketAsset.BTC, scenario=scenario)
             swarm_res = self.arbiter.arbitrate(MarketAsset.BTC, snapshot)
@@ -178,16 +178,16 @@ class TelegramSentinel:
             self.send_message(chat_id, self.format_report_message(report, swarm_res))
 
         else:
-            self.send_message(chat_id, "Unknown command. Use /help to see available commands.")
+            self.send_message(chat_id, "Command not recognized. Use /help.")
 
     def run_polling(self):
         """Polls Telegram for incoming messages."""
         if not TELEGRAM_TOKEN or TELEGRAM_TOKEN.startswith("your_"):
-            print("⚠️ TELEGRAM_BOT_TOKEN is not configured in .env.")
+            print("TELEGRAM_BOT_TOKEN is not configured in .env.")
             print("Running in DEMO SIMULATION mode. Run with --test-alert to see an example.")
             return
 
-        print("🤖 Telegram Sentinel is polling for commands (Ctrl+C to stop)...")
+        print("Telegram Sentinel is polling for commands (Ctrl+C to stop)...")
         while True:
             try:
                 with httpx.Client(timeout=35.0) as client:
@@ -219,9 +219,10 @@ def main():
     if args.test_alert:
         asset_map = {"BTC": MarketAsset.BTC, "ETH": MarketAsset.ETH, "SOL": MarketAsset.SOL}
         asset = asset_map[args.asset]
-        print(f"\n🚀 Simulating autonomous alert for {asset.value} under {args.scenario}...")
+        print(f"\nSimulating autonomous alert for {asset.value} under {args.scenario}...")
         report = sentinel.agent.run_market_audit(asset, scenario=args.scenario)
-        msg = sentinel.format_report_message(report)
+        swarm_res = sentinel.arbiter.arbitrate(asset, MarketDataProvider.get_market_snapshot(asset, scenario=args.scenario))
+        msg = sentinel.format_report_message(report, swarm_res)
         sentinel.send_message(TELEGRAM_CHAT_ID or "YOUR_CHAT_ID", msg)
     else:
         sentinel.run_polling()
