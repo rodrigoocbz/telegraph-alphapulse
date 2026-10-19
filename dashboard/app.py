@@ -19,57 +19,221 @@ from core.database import AlphaVaultDB
 from core.crypto_attestation import CryptoAttestationService
 
 st.set_page_config(
-    page_title="AlphaPulse Swarm | Telegraph Protocol",
+    page_title="AlphaPulse Terminal · Telegraph Protocol",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling
+# Professional Web3 / Bloomberg Terminal Styling
 st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-    .main-title {
-        font-size: 2.3rem;
+    /* Global Base */
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+    code, pre {
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+    .stApp {
+        background-color: #060913;
+        color: #E2E8F0;
+    }
+    
+    /* Header Area */
+    .brand-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0 20px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 24px;
+    }
+    .brand-title {
+        font-size: 2.1rem;
         font-weight: 800;
-        background: linear-gradient(90deg, #00FFA3, #00B8FF);
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #FFFFFF 20%, #94A3B8 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0px;
+        margin: 0;
     }
-    .sub-title {
+    .brand-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0, 255, 163, 0.1);
+        border: 1px solid rgba(0, 255, 163, 0.35);
+        color: #00FFA3;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        vertical-align: middle;
+        margin-left: 10px;
+    }
+    .brand-sub {
+        color: #64748B;
+        font-size: 0.95rem;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+    
+    /* Custom Metric Cards */
+    [data-testid="stMetric"] {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.9) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    [data-testid="stMetric"]:hover {
+        border-color: rgba(0, 255, 163, 0.3);
+        transform: translateY(-2px);
+    }
+    [data-testid="stMetricLabel"] {
+        color: #64748B !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    [data-testid="stMetricValue"] {
+        color: #F8FAFC !important;
+        font-size: 1.6rem !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em;
+    }
+    
+    /* Modern Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #0B1120;
+        padding: 6px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 20px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
         color: #94A3B8;
-        font-size: 1.05rem;
-        margin-bottom: 1.2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 8px 18px;
+        border: none !important;
+        background: transparent;
+        transition: all 0.2s ease;
     }
-    .swarm-card {
-        background: #0F172A;
-        border: 1px solid #1E293B;
-        border-radius: 10px;
-        padding: 16px;
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #F8FAFC;
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(0, 255, 163, 0.15), rgba(0, 229, 255, 0.15)) !important;
+        color: #00FFA3 !important;
+        border: 1px solid rgba(0, 255, 163, 0.4) !important;
+        box-shadow: 0 0 15px rgba(0, 255, 163, 0.1);
+    }
+    
+    /* Glassmorphism Containers */
+    .glass-card {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(11, 17, 32, 0.8) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 16px;
+        backdrop-filter: blur(12px);
+    }
+    .glass-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         margin-bottom: 12px;
     }
-    .status-badge-approved {
-        background-color: #064E3B;
+    
+    /* Status Pills */
+    .badge-approved {
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.4);
         color: #34D399;
+        font-size: 0.75rem;
+        font-weight: 700;
         padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
-    .status-badge-rejected {
-        background-color: #7F1D1D;
+    .badge-slashed {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
         color: #F87171;
+        font-size: 0.75rem;
+        font-weight: 700;
         padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .badge-neutral {
+        background: rgba(148, 163, 184, 0.1);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        color: #94A3B8;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    
+    /* Streamlit Expander Overrides */
+    .streamlit-expanderHeader {
+        background: #0B1120 !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        color: #E2E8F0 !important;
+        font-weight: 600 !important;
+    }
+    .streamlit-expanderContent {
+        background: #070B14 !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-top: none !important;
+        border-bottom-left-radius: 10px !important;
+        border-bottom-right-radius: 10px !important;
+    }
+    
+    /* Custom Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #070B14;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Primary Button */
+    .stButton > button {
+        background: linear-gradient(135deg, #00FFA3 0%, #00B8FF 100%) !important;
+        color: #060913 !important;
+        font-weight: 700 !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 10px 24px !important;
+        box-shadow: 0 4px 15px rgba(0, 255, 163, 0.25) !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    }
+    .stButton > button:hover {
+        transform: scale(1.02) !important;
+        box-shadow: 0 6px 22px rgba(0, 255, 163, 0.4) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.markdown("### ⚙️ Protocol Parameters")
-st.sidebar.markdown("**Telegraph Season II Swarm Engine**")
+st.sidebar.markdown("### 🎛️ Control Panel")
+st.sidebar.markdown("<small style='color:#64748B;'>TELEGRAPH PROTOCOL · SEASON II</small>", unsafe_allow_html=True)
 
 asset_label = st.sidebar.selectbox(
     "Asset to Audit",
@@ -99,18 +263,34 @@ mode = st.sidebar.radio(
     help="Season II live connection kicks off on November 1st."
 )
 
-run_button = st.sidebar.button("🚀 Trigger Swarm & Telegraph Audit", type="primary", use_container_width=True)
+run_button = st.sidebar.button("⚡ Run Telegraph Swarm Audit", use_container_width=True)
 
 st.sidebar.markdown("---")
-st.sidebar.info(
-    "🏆 **Telegraph Hackathon Season II**\n\n"
-    "Track: **Apps & Agents**\n\n"
-    "**Architecture:** Multi-Agent Swarm + Telegraph WASM Evaluators + EIP-712 Smart Contract Verifier."
-)
+st.sidebar.markdown("""
+<div style='background:#0B1120; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06); font-size:0.82rem;'>
+    <b style='color:#00FFA3;'>🏆 Hackathon Track: Apps & Agents</b><br>
+    <span style='color:#94A3B8;'>
+    AlphaPulse unites 3 autonomous agents with Telegraph's WASM scoring engine to produce trustless, EIP-712 verifiable trading decisions.
+    </span>
+</div>
+""", unsafe_allow_html=True)
 
-# Header
-st.markdown("<div class='main-title'>⚡ Telegraph AlphaPulse Swarm</div>", unsafe_allow_html=True)
-st.markdown("<div class='sub-title'>Autonomous Verifiable Financial Intelligence Agent · Swarm Architecture & EIP-712 On-Chain Attestation</div>", unsafe_allow_html=True)
+# Top Brand Bar
+st.markdown("""
+<div class='brand-container'>
+    <div>
+        <div style='display:flex; align-items:center;'>
+            <h1 class='brand-title'>⚡ AlphaPulse Swarm</h1>
+            <span class='brand-pill'>Season II Ready</span>
+        </div>
+        <div class='brand-sub'>Autonomous Verifiable Financial Intelligence · Telegraph Protocol Architecture</div>
+    </div>
+    <div style='text-align:right; font-family:"JetBrains Mono"; font-size:0.8rem; color:#64748B;'>
+        NETWORK: <span style='color:#00FFA3;'>TELEGRAPH-DEVNET-02</span><br>
+        ATTESTOR: <span style='color:#00E5FF;'>0x90F8...C9C1</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # Run Agent logic
 if "report" not in st.session_state or run_button:
@@ -136,7 +316,7 @@ swarm_res = st.session_state.swarm_result
 candles = st.session_state.candles
 snapshot = st.session_state.snapshot
 
-# Top Metrics Row
+# Top KPI Row
 col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
@@ -171,36 +351,40 @@ with col4:
 
 with col5:
     st.metric(
-        label="EIP-712 Attestation",
+        label="EIP-712 Signer",
         value="0x" + swarm_res.eip712_attestation['signer_address'][2:8] + "...",
         delta="Verified On-Chain"
     )
 
-st.markdown("---")
+st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
 
 # Main Section: Tabs
 tab_charts, tab_swarm, tab_matrix, tab_backtest, tab_eip712, tab_db = st.tabs([
-    "📈 Price & Verifiable Signals",
+    "📈 Price & Signals",
     "🐝 Swarm Reasoning",
-    "🔍 Telegraph WASM Matrix",
-    "📊 Backtest vs Raw LLMs",
+    "🔍 WASM Evaluator Matrix",
+    "📊 Backtest vs Raw LLM",
     "🔐 Web3 EIP-712 Proof",
-    "🗄️ Vault Database & Leaderboard"
+    "🗄️ Vault Database"
 ])
 
 # TAB 1: CHARTS & SIGNALS
 with tab_charts:
-    col_chart, col_details = st.columns([2.2, 1])
+    col_chart, col_details = st.columns([2.3, 1])
     
     with col_chart:
-        st.subheader("Asset Telemetry & Target Bounds")
+        st.markdown("<h4 style='font-size:1.1rem; color:#F8FAFC; margin-bottom:12px;'>Real-Time Telemetry & Target Bounds</h4>", unsafe_allow_html=True)
         fig = go.Figure(data=[go.Candlestick(
             x=candles['time'],
             open=candles['open'],
             high=candles['high'],
             low=candles['low'],
             close=candles['close'],
-            name=report.asset.value
+            name=report.asset.value,
+            increasing_line_color='#00FFA3',
+            decreasing_line_color='#FF3B69',
+            increasing_fillcolor='rgba(0, 255, 163, 0.2)',
+            decreasing_fillcolor='rgba(255, 59, 105, 0.2)'
         )])
         
         if report.trade_parameters.get('target_price'):
@@ -215,56 +399,81 @@ with tab_charts:
             fig.add_hline(
                 y=report.trade_parameters['stop_loss'],
                 line_dash="dash",
-                line_color="#FF4B4B",
-                annotation_text=f"Stop Loss: ${report.trade_parameters['stop_loss']:,.2f}",
+                line_color="#FF3B69",
+                annotation_text=f"Stop: ${report.trade_parameters['stop_loss']:,.2f}",
                 annotation_position="bottom right"
             )
 
         fig.update_layout(
             template="plotly_dark",
+            paper_bgcolor="#070B14",
+            plot_bgcolor="#070B14",
             xaxis_rangeslider_visible=False,
-            height=420,
-            margin=dict(l=20, r=20, t=20, b=20)
+            height=430,
+            margin=dict(l=20, r=20, t=20, b=20),
+            xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
+            yaxis=dict(gridcolor="rgba(255,255,255,0.05)")
         )
         st.plotly_chart(fig, use_container_width=True)
 
     with col_details:
-        st.subheader("🎯 Agent Synthesis")
-        st.markdown(f"**Primary Decision:** `{swarm_res.final_arbitrated_action.value}`")
-        st.markdown(f"**Recommended Sizing:** `{report.trade_parameters.get('recommended_position_sizing')}`")
-        st.markdown(f"**Target Price:** `{report.trade_parameters.get('target_price') or 'None (Preserve Capital)'}`")
-        st.markdown(f"**Stop Loss:** `{report.trade_parameters.get('stop_loss') or 'None'}`")
+        st.markdown("""
+        <div class='glass-card'>
+            <h4 style='font-size:1.05rem; margin-top:0; color:#F8FAFC;'>🎯 Action Synthesis</h4>
+        """, unsafe_allow_html=True)
+        st.markdown(f"**Decision:** `{swarm_res.final_arbitrated_action.value}`")
+        st.markdown(f"**Position Sizing:** `{report.trade_parameters.get('recommended_position_sizing')}`")
+        st.markdown(f"**Target Price:** `{report.trade_parameters.get('target_price') or 'Preserve Capital'}`")
+        st.markdown(f"**Stop Loss:** `{report.trade_parameters.get('stop_loss') or 'Preserve Capital'}`")
         
-        st.markdown("**Key Drivers:**")
+        st.markdown("<b style='color:#94A3B8; font-size:0.85rem;'>KEY DRIVERS:</b>", unsafe_allow_html=True)
         for d in report.key_drivers:
-            st.markdown(f"- {d}")
+            st.markdown(f"<span style='font-size:0.85rem;'>• {d}</span>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # TAB 2: SWARM REASONING
 with tab_swarm:
-    st.subheader("🐝 Multi-Agent Swarm Concurrency Breakdown")
+    st.markdown("<h4 style='font-size:1.1rem; color:#F8FAFC; margin-bottom:12px;'>🐝 Multi-Agent Swarm Concurrency Breakdown</h4>", unsafe_allow_html=True)
     st.markdown(
-        "AlphaPulse runs three specialized sub-agents concurrently. Their granular telemetry feeds "
-        "into the **Telegraph Swarm Arbiter**, which packages them into high-dimensional Intents."
+        "<p style='color:#94A3B8; font-size:0.9rem;'>"
+        "Three specialized sub-agents independently interrogate orderbooks, on-chain flows, and derivatives leverage. "
+        "Their telemetry feeds into the <b>Telegraph Arbiter</b> to format high-dimensional Intents."
+        "</p>", unsafe_allow_html=True
     )
 
     for thought in swarm_res.swarm_thoughts:
-        with st.container():
-            st.markdown(f"""
-            <div class='swarm-card'>
-                <h4 style='margin-top:0px; color:#00FFA3;'>🤖 {thought.agent_name} <span style='color:#94A3B8; font-size:0.9rem;'>({thought.role})</span></h4>
-                <p><b>Observation:</b> {thought.key_observation}</p>
-                <p><b>Signal Bias:</b> <code>{thought.signal_bias.value}</code> | <b>Confidence:</b> {int(thought.confidence*100)}% | <b>Anomaly Detected:</b> {'🚨 YES' if thought.detected_anomaly else '✅ NO'}</p>
+        badge_html = "<span class='badge-slashed'>🚨 ANOMALY DETECTED</span>" if thought.detected_anomaly else "<span class='badge-approved'>✓ NORMAL</span>"
+        st.markdown(f"""
+        <div class='glass-card'>
+            <div class='glass-card-header'>
+                <div style='display:flex; align-items:center; gap:8px;'>
+                    <b style='color:#00FFA3; font-size:1rem;'>🤖 {thought.agent_name}</b>
+                    <span style='color:#64748B; font-size:0.85rem;'>· {thought.role}</span>
+                </div>
+                {badge_html}
             </div>
-            """, unsafe_allow_html=True)
+            <p style='color:#E2E8F0; font-size:0.92rem; margin:8px 0;'>{thought.key_observation}</p>
+            <div style='font-family:"JetBrains Mono"; font-size:0.8rem; color:#94A3B8;'>
+                BIAS: <span style='color:#F8FAFC;'>{thought.signal_bias.value}</span> | 
+                CONFIDENCE: <span style='color:#00E5FF;'>{int(thought.confidence*100)}%</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.info(f"**Arbiter Synthesis Narrative:**\n\n{swarm_res.execution_narrative}")
+    st.markdown(f"""
+    <div style='background:rgba(0, 229, 255, 0.08); border:1px solid rgba(0, 229, 255, 0.3); border-radius:12px; padding:16px;'>
+        <b style='color:#00E5FF;'>⚖️ Arbiter Cross-Examination Synthesis:</b><br>
+        <span style='color:#E2E8F0; font-size:0.92rem;'>{swarm_res.execution_narrative}</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 # TAB 3: TELEGRAPH WASM MATRIX
 with tab_matrix:
-    st.subheader("Telegraph Protocol WASM Evaluator Matrix")
+    st.markdown("<h4 style='font-size:1.1rem; color:#F8FAFC; margin-bottom:12px;'>🔍 Telegraph Protocol WASM Evaluator Matrix</h4>", unsafe_allow_html=True)
     st.markdown(
-        "Here you can inspect how competing miners responded to the Intent and how "
-        "Telegraph's Evaluators scored accuracy, consistency, and slashed hallucinating/rogue miners."
+        "<p style='color:#94A3B8; font-size:0.9rem;'>"
+        "Miners compete to serve intents. Deterministic WebAssembly (WASM) scripts evaluate, rank, and slash hallucinating models in real time."
+        "</p>", unsafe_allow_html=True
     )
 
     eval_lookup = {e.miner_id: e for e in report.raw_intelligence.evaluations}
@@ -272,9 +481,9 @@ with tab_matrix:
         ev = eval_lookup.get(miner.miner_id)
         is_approved = ev.passed_benchmark if ev else False
         badge = (
-            "<span class='status-badge-approved'>✓ APPROVED</span>" 
+            "<span class='badge-approved'>✓ APPROVED</span>" 
             if is_approved else 
-            "<span class='status-badge-rejected'>✗ REJECTED / SLASHED</span>"
+            "<span class='badge-slashed'>✗ REJECTED / SLASHED</span>"
         )
         
         with st.expander(f"{'🟢' if is_approved else '🔴'} {miner.miner_name} · {miner.signal.value} ({int(miner.confidence*100)}% conf) — Latency: {miner.latency_ms}ms", expanded=not is_approved):
@@ -288,16 +497,17 @@ with tab_matrix:
             c4.metric("Final Rank Score", f"{ev.final_rank_score:.3f}" if ev else "-")
             
             if ev and ev.notes:
-                st.markdown("**Evaluator Audit Notes:**")
+                st.markdown("<b style='color:#94A3B8; font-size:0.85rem;'>WASM AUDIT LOGS:</b>", unsafe_allow_html=True)
                 for note in ev.notes:
-                    st.markdown(f"- `{note}`")
+                    st.markdown(f"<span style='font-family:\"JetBrains Mono\"; font-size:0.8rem; color:#F87171;'>• {note}</span>", unsafe_allow_html=True)
 
 # TAB 4: QUANTITATIVE BACKTESTING
 with tab_backtest:
-    st.subheader("📊 60-Day Quantitative Backtest: Raw LLM vs Telegraph Swarm")
+    st.markdown("<h4 style='font-size:1.1rem; color:#F8FAFC; margin-bottom:12px;'>📊 60-Day Quantitative Backtest: Raw LLMs vs Telegraph Swarm</h4>", unsafe_allow_html=True)
     st.markdown(
-        "This quantitative simulation stress-tests both strategies across 60 market periods "
-        "including whale accumulations, flash crashes, and liquidity spoofing attacks."
+        "<p style='color:#94A3B8; font-size:0.9rem;'>"
+        "Empirical mathematical comparison over 60 simulated market periods with whale flows, liquidation cascades, and spoofing attacks."
+        "</p>", unsafe_allow_html=True
     )
 
     backtest_data = QuantitativeBacktestEngine.run_simulation(periods=60)
@@ -308,28 +518,28 @@ with tab_backtest:
     bcol1, bcol2, bcol3, bcol4 = st.columns(4)
     with bcol1:
         st.metric(
-            "Telegraph Cumulative Return",
+            "Telegraph Alpha Return",
             f"+{summ['telegraph_total_return_pct']}%",
-            delta=f"Final: ${summ['telegraph_final_capital']:,.0f}"
+            delta=f"Capital: ${summ['telegraph_final_capital']:,.0f}"
         )
     with bcol2:
         st.metric(
-            "Raw LLM Return (Unverified)",
+            "Raw Unverified LLM",
             f"{summ['raw_total_return_pct']}%",
-            delta=f"Final: ${summ['raw_final_capital']:,.0f}",
+            delta=f"Capital: ${summ['raw_final_capital']:,.0f}",
             delta_color="inverse"
         )
     with bcol3:
         st.metric(
-            "Sharpe Ratio (Telegraph vs Raw)",
+            "Sharpe Ratio (TG vs Raw)",
             f"{summ['telegraph_sharpe']} vs {summ['raw_sharpe']}",
-            delta="Risk-Adjusted Performance"
+            delta="Annualized Risk-Adjusted"
         )
     with bcol4:
         st.metric(
             "Spoofing Attacks Avoided",
             f"{summ['spoofing_attacks_avoided_pct']}%",
-            delta=f"Max DD: {summ['telegraph_max_drawdown_pct']}% vs {summ['raw_max_drawdown_pct']}%"
+            delta=f"Max DD: {summ['telegraph_max_drawdown_pct']}%"
         )
 
     # Plot Equity Curve
@@ -346,47 +556,55 @@ with tab_backtest:
         y=bdf['raw_capital'],
         mode='lines',
         name='❌ Raw Unverified LLM',
-        line=dict(color='#FF4B4B', width=2, dash='dot')
+        line=dict(color='#FF3B69', width=2, dash='dot')
     ))
     fig_backtest.update_layout(
-        title="Equity Curve Comparison ($100k Starting Capital)",
+        title="Portfolio Equity Curve ($100,000 USD Base)",
         template="plotly_dark",
+        paper_bgcolor="#070B14",
+        plot_bgcolor="#070B14",
         height=380,
-        margin=dict(l=20, r=20, t=40, b=20),
-        yaxis_title="Portfolio Capital ($ USD)"
+        margin=dict(l=20, r=20, t=50, b=20),
+        yaxis_title="Portfolio Value ($ USD)",
+        xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
+        yaxis=dict(gridcolor="rgba(255,255,255,0.05)")
     )
     st.plotly_chart(fig_backtest, use_container_width=True)
 
 # TAB 5: EIP-712 ON-CHAIN ATTESTATION
 with tab_eip712:
-    st.subheader("🔐 EIP-712 Typed Data Cryptographic Attestation")
+    st.markdown("<h4 style='font-size:1.1rem; color:#F8FAFC; margin-bottom:12px;'>🔐 EIP-712 Typed Data Cryptographic Attestation</h4>", unsafe_allow_html=True)
     st.markdown(
-        "Every decision produced by AlphaPulse is signed using **EIP-712 Typed Data**, "
-        "allowing smart contracts on Ethereum / Arbitrum / Base to verify the signature on-chain before executing swaps."
+        "<p style='color:#94A3B8; font-size:0.9rem;'>"
+        "Every signal produced by AlphaPulse generates a cryptographically signed payload compatible with Ethereum, Arbitrum, and Base smart contracts."
+        "</p>", unsafe_allow_html=True
     )
 
     st.code(json.dumps(swarm_res.eip712_attestation, indent=2), language="json")
 
-    st.markdown("#### 📜 Ready-to-Deploy Solidity Verifier Contract")
+    st.markdown("<h5 style='font-size:1rem; color:#F8FAFC; margin-top:20px;'>📜 Ready-to-Deploy Solidity Verifier Contract</h5>", unsafe_allow_html=True)
     solidity_code = CryptoAttestationService.generate_solidity_verifier_snippet()
     st.code(solidity_code, language="solidity")
 
 # TAB 6: VAULT DATABASE & LEADERBOARD
 with tab_db:
-    st.subheader("🗄️ Persistent Vault Database (SQLite Telemetry)")
+    st.markdown("<h4 style='font-size:1.1rem; color:#F8FAFC; margin-bottom:12px;'>🗄️ Persistent Vault Telemetry Database (SQLite)</h4>", unsafe_allow_html=True)
     
     col_hist, col_leader = st.columns([2, 1])
     
     with col_hist:
-        st.markdown("#### Recent Cryptographic Audit Logs")
+        st.markdown("<b style='color:#94A3B8;'>RECENT AUDIT LOGS:</b>", unsafe_allow_html=True)
         recent_audits = AlphaVaultDB.get_recent_audits(10)
         if recent_audits:
-            st.dataframe(pd.DataFrame(recent_audits)[['intent_id', 'asset', 'scenario', 'action', 'confidence', 'winning_miner', 'timestamp']], use_container_width=True)
+            st.dataframe(
+                pd.DataFrame(recent_audits)[['intent_id', 'asset', 'scenario', 'action', 'confidence', 'winning_miner', 'timestamp']],
+                use_container_width=True
+            )
         else:
             st.info("No audit logs recorded yet.")
 
     with col_leader:
-        st.markdown("#### Miner Win-Rate Leaderboard")
+        st.markdown("<b style='color:#94A3B8;'>MINER WIN-RATE LEADERBOARD:</b>", unsafe_allow_html=True)
         leaderboard = AlphaVaultDB.get_miner_leaderboard()
         if leaderboard:
             st.dataframe(pd.DataFrame(leaderboard), use_container_width=True)
