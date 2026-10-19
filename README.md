@@ -1,38 +1,39 @@
-# ⚡ AlphaPulse Swarm: Autonomous Verifiable Financial Intelligence Agent
-> Built for **Telegraph Hackathon Season II** · Track: **Apps & Agents**  
-> *Autonomous Multi-Agent Swarm · WASM Evaluator Arbitration · EIP-712 On-Chain Attestation*
+# AlphaPulse Swarm
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Telegraph Protocol](https://img.shields.io/badge/Telegraph-Season_II_Ready-00FFA3.svg)](https://telegraphprotocol.com)
-[![Web3: EIP-712](https://img.shields.io/badge/Web3-EIP--712_Attested-purple.svg)](https://eips.ethereum.org/EIPS/eip-712)
+> Autonomous Verifiable Financial Intelligence Agent for Telegraph Protocol Season II  
+> Architecture: Multi-Agent Swarm · WASM Evaluator Arbitration · EIP-712 On-Chain Attestation
 
-AlphaPulse Swarm is an autonomous financial risk sentinel and alpha generation engine designed specifically for **Telegraph Protocol Season II**. 
+[![Python](https://img.shields.io/badge/python-3.9+-0B0F19.svg?style=flat-square)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-0B0F19.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Telegraph Protocol](https://img.shields.io/badge/telegraph-season_ii-0B0F19.svg?style=flat-square)](https://telegraphprotocol.com)
+[![Standard](https://img.shields.io/badge/eip-712-0B0F19.svg?style=flat-square)](https://eips.ethereum.org/EIPS/eip-712)
 
-In high-stakes financial and Web3 environments, trusting a single unverified LLM or API feed leads to catastrophic losses caused by hallucinations, wash trading, and spoofed liquidity walls. AlphaPulse solves this by decomposing market analysis across a **specialized multi-agent swarm**, submitting high-dimensional intents to **Telegraph's decentralized intelligence marketplace**, and executing only when competing miners reach verified consensus scored by deterministic **WASM evaluators**, cryptographically sealed via **EIP-712 on-chain signatures**.
+AlphaPulse Swarm is an autonomous financial risk sentinel and alpha generation engine built for the **Telegraph Protocol Season II Hackathon** (Track: **Apps & Agents**).
 
----
-
-## 🏆 Why AlphaPulse Dominates the "Apps & Agents" Track:
-
-1. **🐝 Multi-Agent Swarm Architecture:** Concurrently runs three micro-agents (`WhaleSentinel`, `MicrostructureAgent`, `MacroVolatilityAgent`) coordinated by the `TelegraphSwarmArbiter`.
-2. **🛡️ Active Defense Against Rogue Miners:** Demonstrates how Telegraph WASM evaluators detect and penalize unbacked hype and spoofing attacks by **-95%**, preserving trading capital.
-3. **📊 Quantitative Backtest Engine:** Proves with empirical statistical rigor how Telegraph-verified signals achieve **Sharpe Ratios > 2.0** and **avoid 100% of simulated spoofing dumps** compared to unverified LLMs (-47% drawdown).
-4. **🔐 Web3 EIP-712 Typed Data Attestation:** Decisions are cryptographically signed and immediately verifiable on-chain by DeFi vaults and smart contracts.
-5. **📈 Live Binance Market Telemetry:** Connects directly to live 24h ticker prices and 1-hour candlestick history with graceful offline fallback.
-6. **🤖 Autonomous Telegram Sentinel Bot:** Proactive 24/7 push alerts and interactive mobile audits via Telegram (`/audit`, `/simulate`, `/backtest`, `/status`).
-7. **🗄️ Persistent Vault Telemetry Database:** SQLite-backed audit trails and miner win-rate leaderboards.
+In high-stakes financial and decentralized finance (DeFi) environments, relying on unverified single-model LLM predictions or raw unverified API feeds introduces significant systemic risk due to hallucinations, orderbook manipulation, wash trading, and liquidity spoofing. AlphaPulse addresses this vulnerability by coordinating a **specialized multi-agent swarm**, formatting high-dimensional financial intents for **Telegraph's decentralized intelligence marketplace**, and executing trades strictly when competing miners achieve verifiable consensus scored by deterministic **WASM evaluators**, cryptographically attested through **EIP-712 structured data signatures**.
 
 ---
 
-## 🏛️ System Architecture
+## Core Capabilities
+
+- **Multi-Agent Swarm Architecture:** Executes three concurrent specialized sub-agents (`WhaleSentinel`, `MicrostructureAgent`, `MacroVolatilityAgent`) coordinated by an arbitration layer (`TelegraphSwarmArbiter`).
+- **Deterministic WASM Validation:** Interrogates Telegraph's WebAssembly evaluation sandbox to penalize hallucinated or manipulated miner proposals (applying up to 95% penalty slashes during spoofing attacks).
+- **Quantitative Simulation Engine:** Includes a 60-period empirical backtesting framework comparing unverified LLM baselines against Telegraph-validated consensus, evaluating Sharpe ratios, Sortino ratios, and maximum drawdown.
+- **EIP-712 Cryptographic Attestation:** Every arbitrated trade recommendation is signed as an EIP-712 typed structured data hash, verifiable on-chain via EVM smart contracts.
+- **Live Market Telemetry:** Connects directly to Binance public REST endpoints for real-time 24-hour spot prices and historical 1-hour candlestick feeds, with automated fallback logic.
+- **Autonomous Telegram Sentinel:** Long-polling notification daemon supporting interactive mobile audits (`/audit`, `/simulate`, `/backtest`, `/status`).
+- **Persistent Telemetry Vault:** Thread-safe SQLite database recording audit histories, miner latencies, scores, and historical win-rate rankings.
+
+---
+
+## System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Market ["Live Market Feeds"]
-        Binance["Binance Live REST API"]
-        OnChain["On-Chain Whales / Mempool"]
-        Orderbook["Orderbook Depth / Spoof Detector"]
+    subgraph Market ["Market Telemetry Ingestion"]
+        Binance["Binance Public REST API"]
+        OnChain["On-Chain Wallet Flows"]
+        Orderbook["Orderbook Depth / Imbalance Telemetry"]
     end
 
     subgraph Swarm ["AlphaPulse Multi-Agent Swarm"]
@@ -43,18 +44,18 @@ flowchart TD
     end
 
     subgraph Protocol ["Telegraph Protocol Network"]
-        Intent["High-Dimensional Intent"]
-        Miners["Competing Miners (DeepSeek, Mistral, LLaMA, Rogue)"]
+        Intent["High-Dimensional Intent Payload"]
+        Miners["Competing Miner Nodes (Mistral, DeepSeek, LLaMA, Unverified)"]
         WASM["WASM Deterministic Evaluator Sandbox"]
-        Consensus["Ranked Verifiable Consensus"]
+        Consensus["Ranked Verifiable Consensus Output"]
     end
 
-    subgraph Execution ["Autonomous Execution & Proofs"]
-        EIP712["EIP-712 Cryptographic Attestation"]
-        DB[("SQLite Vault DB")]
-        Streamlit["Streamlit Dashboard"]
-        Telegram["Telegram Sentinel Bot"]
-        SmartContract["Solidity On-Chain Verifier"]
+    subgraph Execution ["Execution & Settlement Layer"]
+        EIP712["EIP-712 Typed Cryptographic Attestation"]
+        DB[("SQLite Audit Vault")]
+        Streamlit["Terminal Dashboard"]
+        Telegram["Autonomous Telegram Sentinel"]
+        SmartContract["Solidity Verification Contract"]
     end
 
     Market --> Swarm
@@ -71,35 +72,36 @@ flowchart TD
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 telegraph-alpha-agent/
 ├── core/
 │   ├── models.py             # Pydantic schemas for Intents, Miners, Evaluators, and Reports
-│   ├── market_data.py        # Live Binance market data + stress scenarios (Spoofing, Flash Crash, Whales)
-│   ├── telegraph_client.py   # Dual-mode Telegraph Protocol client (MOCK & LIVE Season II)
+│   ├── market_data.py        # Live Binance market data and stress simulation scenarios
+│   ├── telegraph_client.py   # Dual-mode Telegraph Protocol client (MOCK simulation & LIVE Season II)
 │   ├── agent.py              # Autonomous Alpha synthesis engine
-│   ├── swarm.py              # Multi-Agent Swarm (Whale, Micro, Macro) & Arbiter
-│   ├── backtest.py           # Quantitative backtesting simulation engine & financial metrics
-│   ├── crypto_attestation.py # EIP-712 structured data signing & Solidity verifier contract
-│   └── database.py           # Persistent SQLite audit telemetry & miner leaderboard
+│   ├── swarm.py              # Multi-Agent Swarm (Whale, Micro, Macro) and Arbiter
+│   ├── backtest.py           # Quantitative backtesting simulation engine and metrics
+│   ├── crypto_attestation.py # EIP-712 typed data signing and Solidity verification contract
+│   └── database.py           # Persistent SQLite audit telemetry and miner leaderboard
 ├── dashboard/
-│   └── app.py                # 6-tab Streamlit financial terminal with interactive Plotly curves
+│   └── app.py                # Streamlit quantitative terminal interface
 ├── tests/
-│   └── test_agent.py         # Full unit test suite (100% passing)
-├── sentinel_bot.py           # Autonomous Telegram Bot for mobile audits & push alerts
-├── main.py                   # CLI terminal runner with colored matrix output
+│   └── test_agent.py         # Test suite covering Swarm, crypto, and backtest logic
+├── sentinel_bot.py           # Autonomous Telegram Sentinel daemon
+├── main.py                   # Terminal CLI runner
 ├── requirements.txt          # Python dependencies
-├── .env.example              # Configuration variables
+├── .env.example              # Environment variables template
 └── README.md
 ```
 
 ---
 
-## 🚀 Quick Start
+## Installation & Quick Start
 
-### 1. Setup Environment
+### 1. Environment Setup
+
 ```bash
 git clone https://github.com/rodrigoocbz/telegraph-alphapulse.git
 cd telegraph-alphapulse
@@ -108,38 +110,43 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run the Full Test Suite
+### 2. Run Test Suite
+
 ```bash
 python tests/test_agent.py
 ```
 
-### 3. Launch the Streamlit Financial Terminal
+### 3. Launch the Terminal Dashboard
+
 ```bash
 streamlit run dashboard/app.py
 ```
-Open [http://localhost:8501](http://localhost:8501) to explore:
-* **📈 Price & Verifiable Signals:** Live candlestick charts and buy/sell bounds.
-* **🐝 Swarm Reasoning:** Real-time thoughts from WhaleSentinel, Microstructure, and MacroVolatility agents.
-* **🔍 Telegraph WASM Matrix:** Latency, accuracy, and hallucination penalty breakdowns.
-* **📊 Backtest vs Raw LLMs:** Interactive equity curves ($100k starting capital) and Sharpe metrics.
-* **🔐 Web3 EIP-712 Proof:** Real Ethereum-typed signatures and ready-to-deploy Solidity verifier.
-* **🗄️ Vault Database & Leaderboard:** Historical audit records and miner win rates.
 
-### 4. Run the Autonomous Telegram Sentinel Bot
+The interface will be accessible at `http://localhost:8501`, featuring:
+- **Market Telemetry:** Real-time Binance candlestick series and dynamic target bounds.
+- **Swarm Reasoning:** Independent telemetry contributions from concurrent sub-agents.
+- **WASM Evaluators:** Multi-miner accuracy, consistency, latency, and penalty rankings.
+- **Quantitative Benchmark:** Historical capital growth curves and risk-adjusted metrics.
+- **EIP-712 Attestation:** Structured data JSON payload and Solidity smart contract verifier.
+- **Audit Ledger:** Historical transaction records and miner win-rate metrics.
+
+### 4. Run the Telegram Sentinel Bot
+
 ```bash
 python sentinel_bot.py
 ```
-Interact directly from your phone on Telegram:
-* `/audit BTC` - Run live Swarm & Telegraph audit on Bitcoin.
-* `/simulate spoofing` - Inject a market spoofing attack and watch Telegraph defend your capital.
-* `/backtest` - Fetch 60-day quantitative backtesting summary.
-* `/status` - Check agent health, WASM sandboxes, and active models.
+
+Supported commands:
+- `/audit BTC` - Execute live Swarm and Telegraph evaluation on Bitcoin.
+- `/simulate spoofing` - Inject synthetic orderbook spoofing to verify evaluator defense.
+- `/backtest` - Retrieve 60-period quantitative benchmark summary.
+- `/status` - Check daemon and protocol connectivity.
 
 ---
 
-## 📜 On-Chain Solidity Verification
+## On-Chain Verification (Solidity)
 
-AlphaPulse produces standard **EIP-712 typed signatures** verifiable by any EVM smart contract:
+AlphaPulse outputs standard **EIP-712 typed signatures** verifiable on Ethereum, Arbitrum, or Base:
 
 ```solidity
 bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
@@ -159,5 +166,6 @@ require(recoveredSigner == telegraphAttestor, "INVALID_TELEGRAPH_SIGNATURE");
 
 ---
 
-## ⚖️ License
-MIT License. Built for Telegraph Hackathon Season II (November 1 - December 1).
+## License
+
+This project is licensed under the MIT License. Developed for the Telegraph Protocol Season II Hackathon.
