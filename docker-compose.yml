@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  terminal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alphapulse-terminal
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - TELEGRAPH_MODE=MOCK
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    volumes:
+      - ./alphapulse_vault.db:/app/alphapulse_vault.db
+
+  sentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alphapulse-sentinel
+    restart: unless-stopped
+    entrypoint: ["python", "sentinel_bot.py"]
+    environment:
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    depends_on:
+      - terminal
+    volumes:
+      - ./alphapulse_vault.db:/app/alphapulse_vault.db
