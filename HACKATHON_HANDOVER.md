@@ -11,6 +11,10 @@
 ## 1. Executive Summary & Purpose
 AlphaPulse Swarm is an autonomous institutional financial intelligence agent and audit system. It consumes machine intelligence from Telegraph Protocol's decentralized miner network to analyze market microstructure, whale liquidity, and macro volatility across crypto assets (BTC, ETH, SOL, etc.).
 
+Dual-Track Submission:
+1. **Apps & Agents Track:** Autonomous financial intelligence multi-agent swarm with EIP-712 on-chain attestation and institutional telemetry dashboard.
+2. **Evaluators Track:** Verified contributor to the on-chain evaluation pool (5 admitted preference pairs on `ONCHAIN_TX_LOOKUP_GENERAL`, timestamp 2026-10-29 17:21:46 UTC+1).
+
 Key Value Proposition:
 - Solves AI hallucinations in financial decisions by routing Intents to multiple independent miners.
 - Uses simulated WASM Evaluators to score miner predictions and slash rogue/inaccurate providers.
@@ -22,7 +26,8 @@ Key Value Proposition:
 ## 2. Competition Rules & Dates (Season II)
 - **Start Date:** November 1, 2026.
 - **Submission Deadline:** December 1, 2026 at 23:59 UTC (December 2, 00:59 Madrid). Recommended delivery: November 30.
-- **Prizes:** $10,000 pool for H2 ($3,000 for Apps & Agents: 8 x $225 delivery prizes + $700 / $350 / $150 excellence prizes).
+- **Prizes:** $10,000 pool for H2 ($3,000 for Apps & Agents: 8 x $225 delivery prizes + $700 / $350 / $150 excellence prizes; $2,000 for Evaluators: 4 x $300 delivery + $500 / $300 excellence).
+- **Official Wallet (Registered):** `0xEaEe4a29F32E66C37603DDe482f85da6c56B9953`
 - **Minimum Qualifying Score:** 70/100 points (minimum 24/35 in technical quality).
 - **Core Requirement:** Must perform a genuine machine-to-machine purchase/operation via Telegraph (testnet supported, e.g., Base Sepolia USDC). External direct API calls without Telegraph are not eligible.
 
